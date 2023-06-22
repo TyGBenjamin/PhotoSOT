@@ -18,13 +18,13 @@ data class PhotoDTO(
     val thumbnailUrl: String,
     val title: String,
     val url: String
-){
+) {
     /**
      * function to map PhotoDTO To Photo.
      *
      * @return
      */
-    fun toPhoto():Photo{
+    fun toPhoto(): Photo {
         return Photo(
             id = this.id,
             albumId = this.albumId,

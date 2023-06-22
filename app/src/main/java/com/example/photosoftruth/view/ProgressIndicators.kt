@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.photosoftruth.utils.Constants
 
+// TODO: Modifier should be passed through the param and might not need these methods
 
 @Composable
 @Suppress("FunctionNaming")

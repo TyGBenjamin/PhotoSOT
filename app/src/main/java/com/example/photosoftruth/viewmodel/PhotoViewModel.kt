@@ -7,41 +7,46 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.photosoftruth.data.local.entity.Photo
 import com.example.photosoftruth.data.repositoryImpl.RepositoryImpl
-import com.example.photosoftruth.utils.Constants
-import com.example.photosoftruth.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+// TODO: Clean up this class
+/**
+ * Photo view model
+ *
+ * @property repo
+ * @constructor Create empty Photo view model
+ */
 @HiltViewModel
-class PhotoViewModel @Inject constructor(private val repo: RepositoryImpl): ViewModel() {
+class PhotoViewModel @Inject constructor(private val repo: RepositoryImpl) : ViewModel() {
 
-     var state by mutableStateOf(PhotoState())
-    private set
 
-    fun getPhotos() = viewModelScope.launch {
+    var state by mutableStateOf(PhotoState())
+        private set
+
+
+    fun getPhotosEnhanced() = viewModelScope.launch {
+        val photoList = repo.photosIfDbIsEmpty
         state = state.copy(
-            isLoading = true
+            isLoading = false,
+            photoList = photoList.first()
         )
-        delay(Constants.DELAY_TIME)
-        val request = repo.getPhotos()
-        when(request) {
-            is Resource.Error -> Resource.Error(request.errorMessage)
-            Resource.Idle -> Resource.Idle
-            Resource.Loading -> Resource.Loading
-            is Resource.Success -> {
-                state = state.copy(
-                    isLoading = false,
-                    photoList = Resource.Success(request.data)
-                )
-            }
-        }
     }
+
+    fun getPhotosEnhancedWithStaleCheck() = viewModelScope.launch {
+        val photoList = repo.photosIfDbEmptyAndStaleCheck
+        state = state.copy(
+            isLoading = false,
+            photoList = photoList.first()
+        )
+    }
+
     data class PhotoState(
-        var photoList: Resource<List<Photo>> = Resource.Loading,
+        var photoList: List<Photo> = emptyList(),
         var isLoading: Boolean = false,
-        var error:String = ""
+        var error: String = ""
     )
 }
 
